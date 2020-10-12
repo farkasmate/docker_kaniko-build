@@ -16,6 +16,7 @@
 
 FROM golang:latest AS BUILD
 
+ARG COMPONENT=executor
 ARG GOARCH=amd64
 ARG KANIKO_VERSION=master
 
@@ -25,11 +26,12 @@ WORKDIR /go/src
 
 RUN git clone ${REPO} kaniko \
     && git -C /go/src/kaniko checkout --detach ${KANIKO_VERSION} \
-    && make --directory /go/src/kaniko GOARCH=${GOARCH}
+    && make --directory /go/src/kaniko GOARCH=${GOARCH} out/${COMPONENT} \
+    && mv /go/src/kaniko/out/${COMPONENT} /go/src/kaniko/out/entrypoint
 
 FROM scratch
 
-COPY --from=BUILD /go/src/kaniko/out/executor /kaniko/executor
+COPY --from=BUILD /go/src/kaniko/out/entrypoint /kaniko/entrypoint
 COPY --from=BUILD /go/src/kaniko/files/ca-certificates.crt /kaniko/ssl/certs/
 
 ENV HOME /root
@@ -42,4 +44,4 @@ ENV container kube
 
 WORKDIR /workspace
 
-ENTRYPOINT ["/kaniko/executor"]
+ENTRYPOINT ["/kaniko/entrypoint"]

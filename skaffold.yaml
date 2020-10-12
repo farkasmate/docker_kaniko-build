@@ -5,8 +5,8 @@ metadata:
 build:
   artifacts:
     - image: docker-registry.csikoste.com/kaniko-executor-arm
-      kaniko:
-        buildArgs:
+      kaniko: &KANIKO
+        buildArgs: &BUILD_ARGS
           GOARCH: arm
           KANIKO_VERSION: v1.2.0
         cache:
@@ -17,6 +17,12 @@ build:
           - name: persistent-cache
             mountpath: /persistent-cache/
             readonly: true
+    - image: docker-registry.csikoste.com/kaniko-warmer-arm
+      kaniko:
+        <<: *KANIKO
+        buildArgs:
+          <<: *BUILD_ARGS
+          COMPONENT: warmer
   cluster:
     dockerConfig:
       secretName: docker-registry-kanikosecret
@@ -34,3 +40,7 @@ profiles:
         value:
           artifacts:
             - image: docker-registry.csikoste.com/kaniko-executor
+            - image: docker-registry.csikoste.com/kaniko-warmer
+              docker:
+                buildArgs:
+                  COMPONENT: warmer
