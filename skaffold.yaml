@@ -1,0 +1,36 @@
+apiVersion: skaffold/v2beta8
+kind: Config
+metadata:
+  name: kaniko
+build:
+  artifacts:
+    - image: docker-registry.csikoste.com/kaniko-executor-arm
+      kaniko:
+        buildArgs:
+          GOARCH: arm
+          KANIKO_VERSION: v1.2.0
+        cache:
+          repo: docker-registry.csikoste.com/cache
+          hostPath: /cache/
+        image: matefarkas/kaniko-executor:arm-latest-test
+        volumeMounts:
+          - name: persistent-cache
+            mountpath: /persistent-cache/
+            readonly: true
+  cluster:
+    dockerConfig:
+      secretName: docker-registry-kanikosecret
+    volumes:
+      - name: persistent-cache
+        volumesource:
+          persistentvolumeclaim:
+            claimname: kaniko-cache
+
+profiles:
+  - name: dev
+    patches:
+      - op: replace
+        path: /build
+        value:
+          artifacts:
+            - image: docker-registry.csikoste.com/kaniko-executor
