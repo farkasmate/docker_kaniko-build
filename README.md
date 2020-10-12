@@ -13,6 +13,8 @@ To build the `docker-registry.csikoste.com/kaniko-executor-arm` image on the Ras
 skaffold build
 ```
 
+The build private image is re-tagged and shared as `matefarkas/kaniko-executor:<kaniko_version>-arm`.
+
 ## Dev
 
 To build an `amd64` image from the `master` branch locally, run:

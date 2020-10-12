@@ -12,7 +12,7 @@ build:
         cache:
           repo: docker-registry.csikoste.com/cache
           hostPath: /cache/
-        image: matefarkas/kaniko-executor:arm-latest-test
+        image: matefarkas/kaniko-executor:v1.2.0-arm
         volumeMounts:
           - name: persistent-cache
             mountpath: /persistent-cache/
